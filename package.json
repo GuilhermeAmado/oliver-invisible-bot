@@ -1,0 +1,64 @@
+{
+  "name": "oliver-bot",
+  "version": "0.1.0",
+  "description": "A smart Telegram bot that forwards messages",
+  "author": "Guilherme Amado",
+  "main": "public/electron.js",
+  "build": {
+    "appId": "ollie.oliver",
+    "win": {
+      "icon": "build/icon.ico"
+    }
+  },
+  "homepage": "./",
+  "dependencies": {
+    "@blueprintjs/core": "^3.39.0",
+    "@blueprintjs/popover2": "^0.3.0",
+    "@testing-library/jest-dom": "^5.11.4",
+    "@testing-library/react": "^11.1.0",
+    "@testing-library/user-event": "^12.1.10",
+    "cross-env": "^7.0.3",
+    "electron-is-dev": "^1.2.0",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
+    "react-phone-input-2": "^2.13.9",
+    "react-scripts": "4.0.3",
+    "web-vitals": "^1.0.1"
+  },
+  "scripts": {
+    "react-start": "rescripts start",
+    "react-build": "rescripts build",
+    "react-test": "rescripts test",
+    "react-eject": "react-scripts eject",
+    "electron-build": "electron-builder",
+    "build": "yarn run react-build && yarn run electron-build",
+    "start": "concurrently \"cross-env BROWSER=none yarn run react-start\" \"wait-on http://localhost:3000 && electron .\""
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@rescripts/cli": "^0.0.16",
+    "@rescripts/rescript-env": "^0.0.14",
+    "concurrently": "^6.0.0",
+    "electron": "^11.3.0",
+    "electron-builder": "^22.9.1",
+    "electron-devtools-installer": "^3.1.1",
+    "wait-on": "^5.2.1"
+  }
+}

@@ -1,3 +1,5 @@
+const { Client } = require('tdl');
+const { TDLib } = require('tdl-tdlib-addon');
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const os = require('os');
@@ -42,6 +44,37 @@ app.on('activate', () => {
   }
 });
 
-ipcMain.on('phone:submitted', (event, arg) => {
-  console.log(arg.contents);
+// TDL
+const client = new Client(new TDLib(), {
+  apiId: 3166337, // Your api_id
+  apiHash: '28b23f0714e5d6a6df43df3690927515', // Your api_hash
+});
+
+client.on('error', console.error);
+
+async function connectTelegram(phone, code) {
+  client.connectAndLogin(() => ({
+    getPhoneNumber: () =>
+      new Promise((resolve, reject) => {
+        resolve(phone);
+        reject(new TypeError('Invalid phone number'));
+      }),
+    // getAuthCode: () => {
+    //   let code;
+    //   ipcMain.once('code:submitted', (event, arg) => {
+    //     console.log(arg.contents);
+    //   });
+    //   return new Promise((resolve, reject) => {
+    //     resolve('');
+    //   });
+    // },
+  }));
+}
+
+ipcMain.once('phone:submitted', (event, arg) => {
+  console.log('RECEIVED phone:submitted!!!!!!!!!!!!!!!!!!!');
+  connectTelegram(arg.contents);
+});
+ipcMain.on('code:submitted', (event, arg) => {
+  console.log('Recebi: ', arg.contents);
 });

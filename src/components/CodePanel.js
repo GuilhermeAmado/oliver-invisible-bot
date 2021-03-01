@@ -3,12 +3,13 @@ import { Classes, Spinner, InputGroup } from '@blueprintjs/core';
 import 'fs';
 import { ipcRenderer } from 'electron';
 
-const CodePanel = ({ phone }) => {
+const CodePanel = (props) => {
   const [isPending, setIsPending] = useState(true);
+  const [code, setCode] = props.setCode;
   useEffect(() => {
-    console.log('enviando para o back-end isso: ', phone);
+    console.log('enviando para o back-end isso: ', props.phone);
     ipcRenderer.send('phone:submitted', {
-      contents: phone,
+      contents: props.phone,
     });
     return () => {
       console.log('cleanup function here');
@@ -18,7 +19,12 @@ const CodePanel = ({ phone }) => {
     <div className={Classes.DIALOG_BODY}>
       <p>Em instantes você receberá um código de autenticação</p>
       {isPending && <Spinner />}
-      <InputGroup large="true" leftIcon="lock" />
+      <InputGroup
+        large="true"
+        leftIcon="lock"
+        value={code}
+        onChange={(e) => setCode(e.target.value)}
+      />
     </div>
   );
 };

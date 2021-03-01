@@ -23,6 +23,8 @@
     "react-dom": "^17.0.1",
     "react-phone-input-2": "^2.13.9",
     "react-scripts": "4.0.3",
+    "tdl": "^7.0.0",
+    "tdl-tdlib-addon": "^1.0.1",
     "web-vitals": "^1.0.1"
   },
   "scripts": {

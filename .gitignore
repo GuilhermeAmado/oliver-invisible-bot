@@ -3,6 +3,8 @@
 # dependencies
 /node_modules
 /.pnp
+/_td_database
+/_td_files
 .pnp.js
 
 # testing

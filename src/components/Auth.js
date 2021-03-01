@@ -1,3 +1,4 @@
+import { ipcRenderer } from 'electron';
 import React, { useState } from 'react';
 import {
   Dialog,
@@ -14,11 +15,14 @@ import CodePanel from './CodePanel';
 const Auth = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [phone, setPhone] = useState('');
+  const [code, setCode] = useState('');
   const handleOpen = () => setIsOpen(true);
   const handleClose = () => setIsOpen(false);
   const handleClick = () => {
-    console.log('CLICKED');
     handleClose();
+    ipcRenderer.send('code:submitted', {
+      contents: code,
+    });
   };
 
   return (
@@ -46,7 +50,7 @@ const Auth = () => {
         <DialogStep
           id="enter-code"
           title="Código Login"
-          panel={<CodePanel phone={phone} />}
+          panel={<CodePanel phone={phone} setCode={[code, setCode]} />}
         />
       </MultistepDialog>
     </>

@@ -8,7 +8,14 @@ const {
   REACT_DEVELOPER_TOOLS,
 } = require('electron-devtools-installer');
 const isDev = require('electron-is-dev');
+const { ipcRenderer } = require('electron/renderer');
 
+const client = new Client(new TDLib(), {
+  apiId: 3166337, // Your api_id
+  apiHash: '28b23f0714e5d6a6df43df3690927515', // Your api_hash
+});
+
+// CREATE MAIN WINDOW AND CONNECT TO TELEGRAM
 function createWindow() {
   const win = new BrowserWindow({
     width: 800,
@@ -23,6 +30,37 @@ function createWindow() {
       ? 'http://localhost:3000/'
       : `file://${path.join(__dirname, '../build/index.html')}`
   );
+
+  win.webContents.on('did-finish-load', () => {
+    win.webContents.send('ping', '🤘');
+    win.webContents.send('open:dialog');
+  });
+
+  async function connectTelegram() {
+    await client.connect();
+    await client.login(() => ({
+      type: 'user',
+      getPhoneNumber: (retry) => {
+        return new Promise((resolve, reject) => {
+          if (retry) reject('Invalid phone number');
+          ipcMain.once('phone:submitted', (event, arg) => {
+            resolve(arg.contents);
+          });
+          // ipcMain.removeAllListeners();
+        });
+      },
+      // getAuthCode: (retry) => {
+      //   return new Promise((resolve, reject) => {
+      //     if (retry) reject('Invalid code');
+      //     ipcMain.once('code:submitted', (event, arg) => {
+      //       resolve(arg.contents);
+      //     });
+      //   });
+      // },
+    }));
+  }
+
+  connectTelegram();
 }
 
 app.whenReady().then(() => {
@@ -45,36 +83,11 @@ app.on('activate', () => {
 });
 
 // TDL
-const client = new Client(new TDLib(), {
-  apiId: 3166337, // Your api_id
-  apiHash: '28b23f0714e5d6a6df43df3690927515', // Your api_hash
-});
-
 client.on('error', console.error);
 
-async function connectTelegram(phone, code) {
-  client.connectAndLogin(() => ({
-    getPhoneNumber: () =>
-      new Promise((resolve, reject) => {
-        resolve(phone);
-        reject(new TypeError('Invalid phone number'));
-      }),
-    // getAuthCode: () => {
-    //   let code;
-    //   ipcMain.once('code:submitted', (event, arg) => {
-    //     console.log(arg.contents);
-    //   });
-    //   return new Promise((resolve, reject) => {
-    //     resolve('');
-    //   });
-    // },
-  }));
-}
-
-ipcMain.once('phone:submitted', (event, arg) => {
-  console.log('RECEIVED phone:submitted!!!!!!!!!!!!!!!!!!!');
-  connectTelegram(arg.contents);
-});
-ipcMain.on('code:submitted', (event, arg) => {
-  console.log('Recebi: ', arg.contents);
-});
+// ipcMain.once('phone:submitted', (event, arg) => {
+//   console.log('RECEIVED PHONE: ', arg.contents);
+// });
+// ipcMain.once('code:submitted', (event, arg) => {
+//   console.log('RECEIVED CODE: ', arg.contents);
+// });

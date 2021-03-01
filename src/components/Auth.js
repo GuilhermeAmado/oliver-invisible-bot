@@ -1,5 +1,5 @@
 import { ipcRenderer } from 'electron';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   MultistepDialog,
@@ -24,6 +24,12 @@ const Auth = () => {
       contents: code,
     });
   };
+
+  useEffect(() => {
+    ipcRenderer.on('open:dialog', () => {
+      setIsOpen(true);
+    });
+  }, []);
 
   return (
     <>

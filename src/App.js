@@ -1,10 +1,9 @@
 import { ipcRenderer } from 'electron';
 import React, { useEffect } from 'react';
-import { Intent, Spinner } from '@blueprintjs/core';
 import Auth from './components/Auth';
 import TabMenu from './components/TabMenu';
 import { AppToaster } from './components/Toaster';
-const mySpinner = <Spinner intent={Intent.PRIMARY} />;
+import { GlobalProvider } from './GlobalContext';
 
 const App = () => {
   useEffect(() => {
@@ -16,11 +15,13 @@ const App = () => {
   }, []);
   return (
     <>
-      <div className="container bp3-dark">
-        <h1>Oliver Telegram Bot</h1>
-        <TabMenu />
-        <Auth />
-      </div>
+      <GlobalProvider>
+        <div className="container bp3-dark">
+          <h1>Oliver Telegram Bot</h1>
+          <TabMenu />
+          <Auth />
+        </div>
+      </GlobalProvider>
     </>
   );
 };

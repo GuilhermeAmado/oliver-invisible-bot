@@ -1,17 +1,26 @@
-import React from 'react';
+import React, { useState, useContext } from 'react';
 import Select from 'react-select';
+import { GlobalContext } from '../GlobalContext';
 
 const ChatSelect = (props) => {
-  const [chatsToMonitor, setChatsToMonitor] = props.chatsState;
+  const [
+    allChats,
+    setAllChats,
+    chatsToMonitor,
+    setChatsToMonitor,
+    chatToForwardTo,
+    setChatToForwardTo,
+  ] = useContext(GlobalContext);
   return (
     <Select
-      isMulti="true"
+      {...props}
+      maxMenuHeight="200px"
       options={props.options}
       noOptionsMessage={() => 'Não foi encontrado nenhum chat :('}
       className="react-select-container"
       classNamePrefix="react-select"
       placeholder="Selecione ou digite o nome do chat..."
-      onChange={setChatsToMonitor}
+      onChange={props.onChange}
       theme={(theme) => ({
         ...theme,
         fontFamily: 'inherit',

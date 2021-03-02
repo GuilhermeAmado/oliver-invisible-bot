@@ -14,7 +14,6 @@ const client = new Client(new TDLib(), {
   apiHash: '28b23f0714e5d6a6df43df3690927515', // Your api_hash
 });
 
-const needAuth = client._authNeeded;
 console.log('*************CLIENT: ', util.inspect(client, false, null, true));
 
 // CREATE MAIN WINDOW AND CONNECT TO TELEGRAM
@@ -35,8 +34,11 @@ function createWindow() {
 
   win.webContents.on('did-finish-load', () => {
     win.webContents.send('ping', '🤘');
-    console.log('_________________NEEDAUTH: ', needAuth);
-    if (needAuth) {
+    console.log(
+      '*************CLIENT: ',
+      util.inspect(client, false, null, true)
+    );
+    if (client._authNeeded) {
       win.webContents.send('open:dialog');
     }
   });
@@ -59,6 +61,8 @@ function createWindow() {
       },
     }));
 
+    client.on('error', console.error);
+
     const result = await client.invoke({
       _: 'getChats',
       offset_order: '9223372036854775807',
@@ -66,13 +70,7 @@ function createWindow() {
       limit: 100,
     });
     console.log(result);
-
-    const authState = await client.invoke({
-      _: 'getAuthorizationState',
-    });
-    console.log(authState);
   }
-
   connectTelegram();
 }
 
@@ -96,7 +94,6 @@ app.on('activate', () => {
 });
 
 // TDL
-client.on('error', console.error);
 
 // ipcMain.once('phone:submitted', (event, arg) => {
 //   console.log('RECEIVED PHONE: ', arg.contents);

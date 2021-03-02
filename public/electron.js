@@ -2,18 +2,20 @@ const { Client } = require('tdl');
 const { TDLib } = require('tdl-tdlib-addon');
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
-const os = require('os');
+const util = require('util');
 const {
   default: installExtension,
   REACT_DEVELOPER_TOOLS,
 } = require('electron-devtools-installer');
 const isDev = require('electron-is-dev');
-const { ipcRenderer } = require('electron/renderer');
 
 const client = new Client(new TDLib(), {
   apiId: 3166337, // Your api_id
   apiHash: '28b23f0714e5d6a6df43df3690927515', // Your api_hash
 });
+
+const needAuth = client._authNeeded;
+console.log('*************CLIENT: ', util.inspect(client, false, null, true));
 
 // CREATE MAIN WINDOW AND CONNECT TO TELEGRAM
 function createWindow() {
@@ -33,31 +35,42 @@ function createWindow() {
 
   win.webContents.on('did-finish-load', () => {
     win.webContents.send('ping', '🤘');
-    win.webContents.send('open:dialog');
+    console.log('_________________NEEDAUTH: ', needAuth);
+    if (needAuth) {
+      win.webContents.send('open:dialog');
+    }
   });
 
   async function connectTelegram() {
-    await client.connect();
-    await client.login(() => ({
-      type: 'user',
-      getPhoneNumber: (retry) => {
+    await client.connectAndLogin(() => ({
+      getPhoneNumber: () => {
         return new Promise((resolve, reject) => {
-          if (retry) reject('Invalid phone number');
           ipcMain.once('phone:submitted', (event, arg) => {
             resolve(arg.contents);
           });
-          // ipcMain.removeAllListeners();
         });
       },
-      // getAuthCode: (retry) => {
-      //   return new Promise((resolve, reject) => {
-      //     if (retry) reject('Invalid code');
-      //     ipcMain.once('code:submitted', (event, arg) => {
-      //       resolve(arg.contents);
-      //     });
-      //   });
-      // },
+      getAuthCode: () => {
+        return new Promise((resolve, reject) => {
+          ipcMain.once('code:submitted', (event, arg) => {
+            resolve(arg.contents);
+          });
+        });
+      },
     }));
+
+    const result = await client.invoke({
+      _: 'getChats',
+      offset_order: '9223372036854775807',
+      offset_chat_id: 0,
+      limit: 100,
+    });
+    console.log(result);
+
+    const authState = await client.invoke({
+      _: 'getAuthorizationState',
+    });
+    console.log(authState);
   }
 
   connectTelegram();

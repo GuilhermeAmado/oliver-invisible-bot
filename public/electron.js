@@ -4,7 +4,7 @@ const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const util = require('util');
 const isDev = require('electron-is-dev');
-const { client, getChatInfo, forwardMessage } = require('../src/tdl/client');
+const { client, getChatInfo, forwardMessage } = require('./tdl/client');
 const {
   default: installExtension,
   REACT_DEVELOPER_TOOLS,
@@ -13,8 +13,8 @@ const {
 // CREATE MAIN WINDOW AND CONNECT TO TELEGRAM
 function createWindow() {
   const win = new BrowserWindow({
-    width: 900,
-    height: 600,
+    width: 1280,
+    height: 720,
     webPreferences: {
       nodeIntegration: true,
     },

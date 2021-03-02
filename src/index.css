@@ -58,6 +58,22 @@ h2 {
   width: 100%;
 }
 
-/* .bp3-tab-list {
-  border: 1px solid red;
-} */
+.react-select-container {
+  background-color: transparent !important;
+}
+
+.react-select__control {
+  background-color: rgba(16, 22, 26, 0.3) !important;
+  border: none !important;
+  box-shadow: 0 0 0 0 rgb(19 124 189 / 0%), 0 0 0 0 rgb(19 124 189 / 0%),
+    0 0 0 0 rgb(19 124 189 / 0%), inset 0 0 0 1px rgb(16 22 26 / 30%),
+    inset 0 1px 1px rgb(16 22 26 / 40%) !important;
+  color: #f5f8fa !important;
+}
+
+.react-select__input {
+  /* background-color: #f5f8fa !important; */
+}
+.react-select__input input:focus {
+  box-shadow: none;
+}

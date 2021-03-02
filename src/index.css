@@ -24,9 +24,24 @@
     url('./assets/webfonts/wotfard-semibold-webfont.woff2') format('woff2');
 }
 
+a,
+button,
+.bp3-tab {
+  /* cursor: default !important; */
+  outline: none;
+}
+
 body {
   font-family: 'Wotfard Medium';
   background-color: #293742;
+}
+
+h1 {
+  text-align: center;
+}
+
+h2 {
+  margin-top: 0;
 }
 
 .container,
@@ -39,6 +54,10 @@ body {
   min-width: 80vw !important;
 }
 
-.yahoo {
-  margin-top: 5rem;
+.bp3-tab-panel {
+  width: 100%;
 }
+
+/* .bp3-tab-list {
+  border: 1px solid red;
+} */

@@ -3,23 +3,17 @@ const { TDLib } = require('tdl-tdlib-addon');
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const util = require('util');
+const isDev = require('electron-is-dev');
+const { client, getChatInfo, forwardMessage } = require('../src/tdl/client');
 const {
   default: installExtension,
   REACT_DEVELOPER_TOOLS,
 } = require('electron-devtools-installer');
-const isDev = require('electron-is-dev');
-
-const client = new Client(new TDLib(), {
-  apiId: 3166337, // Your api_id
-  apiHash: '28b23f0714e5d6a6df43df3690927515', // Your api_hash
-});
-
-console.log('*************CLIENT: ', util.inspect(client, false, null, true));
 
 // CREATE MAIN WINDOW AND CONNECT TO TELEGRAM
 function createWindow() {
   const win = new BrowserWindow({
-    width: 800,
+    width: 900,
     height: 600,
     webPreferences: {
       nodeIntegration: true,
@@ -33,13 +27,13 @@ function createWindow() {
   );
 
   win.webContents.on('did-finish-load', () => {
-    win.webContents.send('ping', '🤘');
-    console.log(
-      '*************CLIENT: ',
-      util.inspect(client, false, null, true)
-    );
     if (client._authNeeded) {
       win.webContents.send('open:dialog');
+    } else {
+      win.webContents.send('open:toast', {
+        intent: 'success',
+        message: 'Conectado ao Telegram!',
+      });
     }
   });
 
@@ -63,22 +57,51 @@ function createWindow() {
 
     client.on('error', console.error);
 
-    const result = await client.invoke({
-      _: 'getChats',
-      offset_order: '9223372036854775807',
-      offset_chat_id: 0,
-      limit: 100,
-    });
-    console.log(result);
+    // client.on('update', (update) => {
+    //   console.log('______UPDATE', util.inspect(update, false, null, true));
+    // });
   }
+
   connectTelegram();
+
+  async function getChatList() {
+    return new Promise(async (resolve, reject) => {
+      const { chat_ids } = await client.invoke({
+        _: 'getChats',
+        offset_order: '9223372036854775807',
+        offset_chat_id: 0,
+        limit: 100,
+      });
+      const chats = [];
+      for (const chatId of chat_ids) {
+        const chat = await client.invoke({
+          _: 'getChat',
+          chat_id: chatId,
+        });
+        chats.push({
+          id: chat.id,
+          type: chat.type._,
+          title: chat.title,
+          permissions: chat.permissions,
+        });
+      }
+      resolve(chats);
+    });
+  }
+
+  ipcMain.on('get:chats', async (event, arg) => {
+    console.log('HEYY ⚡ Front end want the chats!!');
+    const allChats = await getChatList().then((chats) => chats);
+    event.reply('got:chats', { contents: allChats });
+  });
 }
 
 app.whenReady().then(() => {
   createWindow();
-  installExtension(REACT_DEVELOPER_TOOLS)
-    .then((name) => console.log(`Added Extension:  ${name}`))
-    .catch((err) => console.log('An error occurred: ', err));
+  isDev &&
+    installExtension(REACT_DEVELOPER_TOOLS)
+      .then((name) => console.log(`Added Extension:  ${name}`))
+      .catch((err) => console.log('An error occurred: ', err));
 });
 
 app.on('window-all-closed', () => {
@@ -94,10 +117,3 @@ app.on('activate', () => {
 });
 
 // TDL
-
-// ipcMain.once('phone:submitted', (event, arg) => {
-//   console.log('RECEIVED PHONE: ', arg.contents);
-// });
-// ipcMain.once('code:submitted', (event, arg) => {
-//   console.log('RECEIVED CODE: ', arg.contents);
-// });

@@ -1,22 +1,27 @@
 import { ipcRenderer } from 'electron';
 import React, { useEffect } from 'react';
-import { Button, Intent, Spinner } from '@blueprintjs/core';
+import { Intent, Spinner } from '@blueprintjs/core';
 import Auth from './components/Auth';
+import TabMenu from './components/TabMenu';
+import { AppToaster } from './components/Toaster';
 const mySpinner = <Spinner intent={Intent.PRIMARY} />;
 
 const App = () => {
   useEffect(() => {
-    ipcRenderer.on('ping', (event, message) => {
+    ipcRenderer.send('get:chats');
+    ipcRenderer.once('open:toast', (event, props) => {
       console.log('IT WORKS!');
-      console.log(message);
+      AppToaster.show({ ...props });
     });
   }, []);
   return (
-    <div className="container bp3-dark">
-      <h1>Hello World</h1>
-      <h3>oliver telegram bot</h3>
-      <Auth />
-    </div>
+    <>
+      <div className="container bp3-dark">
+        <h1>Oliver Telegram Bot</h1>
+        <TabMenu />
+        <Auth />
+      </div>
+    </>
   );
 };
 

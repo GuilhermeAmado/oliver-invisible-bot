@@ -12,6 +12,10 @@ const App = () => {
       console.log('IT WORKS!');
       AppToaster.show({ ...props });
     });
+    ipcRenderer.on('update', (event, props) => {
+      console.log('⚡ BACK END RECEBEU UPDATE');
+      AppToaster.show({ ...props });
+    });
   }, []);
   return (
     <>

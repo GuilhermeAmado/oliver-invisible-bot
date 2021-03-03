@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { ipcRenderer } from 'electron';
-import { Spinner, Callout } from '@blueprintjs/core';
+import { Spinner, Callout, Button } from '@blueprintjs/core';
 import ChatSelect from './ChatSelect';
 import { GlobalContext } from '../GlobalContext';
 
@@ -14,6 +14,7 @@ const FwMessagesPanel = () => {
     chatToForwardTo,
     setChatToForwardTo,
   ] = useContext(GlobalContext);
+
   useEffect(() => {
     ipcRenderer.on('got:chats', (event, props) => {
       console.log('HEEEYY I got the chats');
@@ -26,16 +27,16 @@ const FwMessagesPanel = () => {
           };
         })
       );
-      // setChatsToMonitor(chatList);
       setIsPending(false);
     });
   }, []);
-  // const chats = chatList.map((chat) => {
-  //   return {
-  //     value: chat.id,
-  //     label: chat.title,
-  //   };
-  // });
+
+  function handleClick() {
+    ipcRenderer.send('start:monitor', {
+      chatsToMonitor,
+      chatToForwardTo,
+    });
+  }
   return (
     <>
       {allChats.length > 0 && isPending ? (
@@ -59,6 +60,14 @@ const FwMessagesPanel = () => {
                 !chatsToMonitor.find(({ value }) => chat.value === value)
             )}
             onChange={setChatToForwardTo}
+          />
+          <br />
+          <Button
+            text="Iniciar"
+            className="center"
+            fill
+            intent="primary"
+            onClick={handleClick}
           />
         </>
       )}

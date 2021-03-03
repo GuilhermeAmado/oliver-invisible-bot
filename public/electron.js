@@ -10,10 +10,12 @@ const {
   REACT_DEVELOPER_TOOLS,
 } = require('electron-devtools-installer');
 
+let chatIdArray = [];
+
 // CREATE MAIN WINDOW AND CONNECT TO TELEGRAM
 function createWindow() {
   const win = new BrowserWindow({
-    width: 1280,
+    width: 960,
     height: 720,
     webPreferences: {
       nodeIntegration: true,
@@ -37,6 +39,20 @@ function createWindow() {
     }
   });
 
+  client.on('error', console.error);
+
+  client.on('update', (update) => {
+    const id = update?.message?.chat_id;
+    if (update._ === 'updateNewMessage' && chatIdArray.includes(id)) {
+      console.log('______UPDATE', util.inspect(update, false, null, true));
+      console.log('++++++chatIdArray: ', chatIdArray);
+      win.webContents.send('update', {
+        intent: 'success',
+        message: '⚡ BACKEND RECEBEU UPDATE!',
+      });
+    }
+  });
+
   async function connectTelegram() {
     await client.connectAndLogin(() => ({
       getPhoneNumber: () => {
@@ -54,12 +70,6 @@ function createWindow() {
         });
       },
     }));
-
-    client.on('error', console.error);
-
-    // client.on('update', (update) => {
-    //   console.log('______UPDATE', util.inspect(update, false, null, true));
-    // });
   }
 
   connectTelegram();
@@ -93,6 +103,14 @@ function createWindow() {
     console.log('HEYY ⚡ Front end want the chats!!');
     const allChats = await getChatList().then((chats) => chats);
     event.reply('got:chats', { contents: allChats });
+  });
+
+  ipcMain.on('start:monitor', (event, args) => {
+    console.log('RECEBI COMANDO PARA MONITORAR!');
+    chatIdArray = [];
+    args.chatsToMonitor.forEach((chat) => chatIdArray.push(chat.value));
+    console.log(chatIdArray);
+    console.log(args);
   });
 }
 

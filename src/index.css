@@ -44,6 +44,10 @@ h2 {
   margin-top: 0;
 }
 
+button {
+  outline: none !important;
+}
+
 .container,
 .bp3-dialog {
   max-width: 80vw;

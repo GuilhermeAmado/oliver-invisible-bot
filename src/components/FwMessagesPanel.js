@@ -6,14 +6,16 @@ import { GlobalContext } from '../GlobalContext';
 
 const FwMessagesPanel = () => {
   const [isPending, setIsPending] = useState(true);
-  const [
+  const {
     allChats,
     setAllChats,
     chatsToMonitor,
     setChatsToMonitor,
     chatToForwardTo,
     setChatToForwardTo,
-  ] = useContext(GlobalContext);
+    isMonitoring,
+    setIsMonitoring,
+  } = useContext(GlobalContext);
 
   useEffect(() => {
     ipcRenderer.on('got:chats', (event, props) => {
@@ -29,13 +31,16 @@ const FwMessagesPanel = () => {
       );
       setIsPending(false);
     });
-  }, []);
+  }, []); //eslint-disable-line
 
-  function handleClick() {
+  function handleClickIniciar() {
     ipcRenderer.send('start:monitor', {
       chatsToMonitor,
       chatToForwardTo,
     });
+  }
+  function handleClickParar() {
+    ipcRenderer.send('stop:monitor');
   }
   return (
     <>
@@ -63,11 +68,18 @@ const FwMessagesPanel = () => {
           />
           <br />
           <Button
-            text="Iniciar"
-            className="center"
+            text={!isMonitoring ? 'Iniciar' : 'Monitorando...'}
             fill
             intent="primary"
-            onClick={handleClick}
+            onClick={handleClickIniciar}
+            disabled={isMonitoring}
+          />
+          <br />
+          <Button
+            text="Parar"
+            fill
+            onClick={handleClickParar}
+            disabled={!isMonitoring}
           />
         </>
       )}

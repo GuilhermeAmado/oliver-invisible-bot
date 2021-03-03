@@ -1,16 +1,7 @@
 import React, { useState, useContext } from 'react';
 import Select from 'react-select';
-import { GlobalContext } from '../GlobalContext';
 
 const ChatSelect = (props) => {
-  const [
-    allChats,
-    setAllChats,
-    chatsToMonitor,
-    setChatsToMonitor,
-    chatToForwardTo,
-    setChatToForwardTo,
-  ] = useContext(GlobalContext);
   return (
     <Select
       {...props}

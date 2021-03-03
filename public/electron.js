@@ -4,13 +4,14 @@ const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const util = require('util');
 const isDev = require('electron-is-dev');
-const { client, getChatInfo, forwardMessage } = require('./tdl/client');
-const {
-  default: installExtension,
-  REACT_DEVELOPER_TOOLS,
-} = require('electron-devtools-installer');
+const { client, forwardMessage } = require('./tdl/client');
+// const {
+//   default: installExtension,
+//   REACT_DEVELOPER_TOOLS,
+// } = require('electron-devtools-installer');
 
 let chatIdArray = [];
+let chatIdToForwardTo = null;
 
 // CREATE MAIN WINDOW AND CONNECT TO TELEGRAM
 function createWindow() {
@@ -35,20 +36,6 @@ function createWindow() {
       win.webContents.send('open:toast', {
         intent: 'success',
         message: 'Conectado ao Telegram!',
-      });
-    }
-  });
-
-  client.on('error', console.error);
-
-  client.on('update', (update) => {
-    const id = update?.message?.chat_id;
-    if (update._ === 'updateNewMessage' && chatIdArray.includes(id)) {
-      console.log('______UPDATE', util.inspect(update, false, null, true));
-      console.log('++++++chatIdArray: ', chatIdArray);
-      win.webContents.send('update', {
-        intent: 'success',
-        message: '⚡ BACKEND RECEBEU UPDATE!',
       });
     }
   });
@@ -108,9 +95,53 @@ function createWindow() {
   ipcMain.on('start:monitor', (event, args) => {
     console.log('RECEBI COMANDO PARA MONITORAR!');
     chatIdArray = [];
+    chatIdToForwardTo = null;
     args.chatsToMonitor.forEach((chat) => chatIdArray.push(chat.value));
-    console.log(chatIdArray);
+    chatIdToForwardTo = args.chatToForwardTo.value;
     console.log(args);
+    console.log(chatIdArray);
+    console.log(chatIdToForwardTo);
+    if (chatIdToForwardTo && chatIdArray.length > 0) {
+      console.log('tem id e array é maior que zero');
+      event.reply('started:monitoring', {
+        intent: 'primary',
+        message: 'Monitoramento iniciado ✔',
+      });
+    }
+    if (chatIdArray.includes(chatIdToForwardTo)) {
+      event.reply('stopped:monitoring', {
+        intent: 'danger',
+        message: 'O grupo que recebe as mensagens não pode ser monitorado',
+      });
+    }
+  });
+
+  ipcMain.on('stop:monitor', (event, args) => {
+    console.log('Recebi o comando para PARAR de monitorar! 🤚🛑');
+    chatIdArray = [];
+    chatIdToForwardTo = null;
+    event.reply('stopped:monitoring', {
+      intent: 'warning',
+      message: 'Monitoramento parado!',
+    });
+  });
+
+  client.on('error', console.error);
+
+  client.on('update', (update) => {
+    const id = update?.message?.chat_id;
+    if (
+      chatIdToForwardTo &&
+      chatIdArray.includes(id) &&
+      update._ === 'updateNewMessage'
+    ) {
+      // console.log('______UPDATE', util.inspect(update, false, null, true));
+      forwardMessage(chatIdToForwardTo, id, update.message.id);
+      win.webContents.send('update', {
+        intent: 'success',
+        message: '✅ MENSAGEM ENCAMINHADA! ',
+      });
+    }
   });
 }
 

@@ -14,7 +14,7 @@ const CodePanel = (props) => {
     return () => {
       console.log('cleanup function here');
     };
-  }, []);
+  }, []); //eslint-disable-line
   return (
     <div className={Classes.DIALOG_BODY}>
       <p>Em instantes você receberá um código de autenticação</p>
@@ -24,6 +24,7 @@ const CodePanel = (props) => {
         leftIcon="lock"
         value={code}
         onChange={(e) => setCode(e.target.value)}
+        maxLength="5"
       />
     </div>
   );

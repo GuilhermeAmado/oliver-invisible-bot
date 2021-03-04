@@ -1,10 +1,34 @@
 const { Client } = require('tdl');
 const { TDLib } = require('tdl-tdlib-addon');
+const { ipcMain } = require('electron');
 
 const client = new Client(new TDLib(), {
   apiId: 3166337, // Your api_id
   apiHash: '28b23f0714e5d6a6df43df3690927515', // Your api_hash
 });
+
+async function connectTelegram() {
+  await client.connect();
+}
+
+async function loginTelegram() {
+  await client.login(() => ({
+    getPhoneNumber: () => {
+      return new Promise((resolve, reject) => {
+        ipcMain.once('phone:submitted', (event, arg) => {
+          resolve(arg.contents);
+        });
+      });
+    },
+    getAuthCode: () => {
+      return new Promise((resolve, reject) => {
+        ipcMain.once('code:submitted', (event, arg) => {
+          resolve(arg.contents);
+        });
+      });
+    },
+  }));
+}
 
 // Invocations, returns promise
 async function getChatInfo(id) {
@@ -25,4 +49,10 @@ async function forwardMessage(chatTo, chatFrom, messageId) {
   });
 }
 
-module.exports = { client, getChatInfo, forwardMessage };
+module.exports = {
+  client,
+  connectTelegram,
+  loginTelegram,
+  getChatInfo,
+  forwardMessage,
+};

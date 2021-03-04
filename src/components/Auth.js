@@ -26,7 +26,7 @@ const Auth = () => {
   };
 
   useEffect(() => {
-    ipcRenderer.on('open:dialog', () => {
+    ipcRenderer.on('auth:needed', () => {
       setIsOpen(true);
     });
   }, []);
@@ -42,9 +42,11 @@ const Auth = () => {
         className="container bp3-dark"
         nextButtonProps={{
           text: 'Próximo',
+          disabled: phone === '' || phone.length < 13,
         }}
         finalButtonProps={{
           text: 'Conectar',
+          disabled: code === '' || code.length < 5,
           onClick: handleClick,
         }}
       >

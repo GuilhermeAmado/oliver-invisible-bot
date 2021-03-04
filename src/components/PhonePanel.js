@@ -21,6 +21,9 @@ const PhonePanel = (props) => {
           placeholder="+55 (99) 8888-0000"
           disableDropdown="true"
           countryCodeEditable="false"
+          inputProps={{
+            required: true,
+          }}
         />
       </div>
     </div>

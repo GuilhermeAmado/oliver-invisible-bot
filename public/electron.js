@@ -4,7 +4,12 @@ const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const util = require('util');
 const isDev = require('electron-is-dev');
-const { client, forwardMessage } = require('./tdl/client');
+const {
+  client,
+  connectTelegram,
+  loginTelegram,
+  forwardMessage,
+} = require('./tdl/client');
 const {
   default: installExtension,
   REACT_DEVELOPER_TOOLS,
@@ -12,6 +17,31 @@ const {
 
 let chatIdArray = [];
 let chatIdToForwardTo = null;
+
+async function getChatList() {
+  return new Promise(async (resolve, reject) => {
+    const { chat_ids } = await client.invoke({
+      _: 'getChats',
+      offset_order: '9223372036854775807',
+      offset_chat_id: 0,
+      limit: 100,
+    });
+    const chats = [];
+    for (const chatId of chat_ids) {
+      const chat = await client.invoke({
+        _: 'getChat',
+        chat_id: chatId,
+      });
+      chats.push({
+        id: chat.id,
+        type: chat.type._,
+        title: chat.title,
+        permissions: chat.permissions,
+      });
+    }
+    resolve(chats);
+  });
+}
 
 // CREATE MAIN WINDOW AND CONNECT TO TELEGRAM
 function createWindow() {
@@ -29,68 +59,19 @@ function createWindow() {
       : `file://${path.join(__dirname, '../build/index.html')}`
   );
 
-  win.webContents.on('did-finish-load', () => {
-    if (client._authNeeded) {
-      win.webContents.send('open:dialog');
-    } else {
-      win.webContents.send('open:toast', {
-        intent: 'success',
-        message: 'Conectado ao Telegram!',
-        icon: 'tick-circle',
-      });
-    }
-  });
-
-  async function connectTelegram() {
-    await client.connectAndLogin(() => ({
-      getPhoneNumber: () => {
-        return new Promise((resolve, reject) => {
-          ipcMain.once('phone:submitted', (event, arg) => {
-            resolve(arg.contents);
-          });
-        });
-      },
-      getAuthCode: () => {
-        return new Promise((resolve, reject) => {
-          ipcMain.once('code:submitted', (event, arg) => {
-            resolve(arg.contents);
-          });
-        });
-      },
-    }));
-  }
-
-  connectTelegram();
-
-  async function getChatList() {
-    return new Promise(async (resolve, reject) => {
-      const { chat_ids } = await client.invoke({
-        _: 'getChats',
-        offset_order: '9223372036854775807',
-        offset_chat_id: 0,
-        limit: 100,
-      });
-      const chats = [];
-      for (const chatId of chat_ids) {
-        const chat = await client.invoke({
-          _: 'getChat',
-          chat_id: chatId,
-        });
-        chats.push({
-          id: chat.id,
-          type: chat.type._,
-          title: chat.title,
-          permissions: chat.permissions,
-        });
-      }
-      resolve(chats);
+  win.webContents.on('did-finish-load', async () => {
+    connectTelegram()
+      .then(() => console.log('CONECTADO!'))
+      .catch((err) => console.log(err));
+    client.on('auth-needed', () => {
+      win.webContents.send('auth:needed');
     });
-  }
-
-  ipcMain.on('get:chats', async (event, arg) => {
-    console.log('HEYY ⚡ Front end want the chats!!');
-    const allChats = await getChatList().then((chats) => chats);
-    event.reply('got:chats', { contents: allChats });
+    loginTelegram()
+      .then(async () => {
+        const allChats = await getChatList().then((chats) => chats);
+        win.webContents.send('got:chats', { contents: allChats });
+      })
+      .catch((err) => console.log(err));
   });
 
   ipcMain.on('start:monitor', (event, args) => {

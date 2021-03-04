@@ -8,7 +8,13 @@ import { GlobalContext } from './GlobalContext';
 const App = () => {
   const { isMonitoring, setIsMonitoring } = useContext(GlobalContext);
   useEffect(() => {
-    ipcRenderer.send('get:chats');
+    // ipcRenderer.send('get:chats');
+    ipcRenderer.on('auth:needed', (event, props) => {
+      console.log('OPA! O usuário precisa fazer login!!! ⚡');
+    });
+    ipcRenderer.on('auth:ok', (event, props) => {
+      console.log('OPA! O usuário está conectado! 🆗👌');
+    });
     ipcRenderer.once('open:toast', (event, props) => {
       AppToaster.show({ ...props });
     });

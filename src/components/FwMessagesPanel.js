@@ -26,6 +26,7 @@ const FwMessagesPanel = () => {
           return {
             value: chat.id,
             label: chat.title,
+            can_send_messages: chat.permissions.can_send_messages,
           };
         })
       );
@@ -74,6 +75,7 @@ const FwMessagesPanel = () => {
           <ChatSelect
             options={allChats.filter(
               (chat) =>
+                chat.can_send_messages &&
                 !chatsToMonitor.find(({ value }) => chat.value === value)
             )}
             onChange={setChatToForwardTo}

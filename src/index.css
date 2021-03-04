@@ -31,6 +31,12 @@ button,
   outline: none;
 }
 
+button {
+  display: inline-block;
+  /* max-width: 200px; */
+  margin: 0 auto;
+}
+
 body {
   font-family: 'Wotfard Medium';
   background-color: #293742;
@@ -60,6 +66,14 @@ button {
 
 .bp3-tab-panel {
   width: 100%;
+}
+
+.bp3-callout {
+  min-height: 86px;
+}
+
+.bp3-toast-message {
+  text-align: center;
 }
 
 .react-select-container {

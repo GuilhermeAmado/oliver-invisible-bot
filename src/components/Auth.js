@@ -33,7 +33,7 @@ const Auth = () => {
 
   return (
     <>
-      <Button onClick={handleOpen}>Show dialog</Button>
+      {/*<Button onClick={handleOpen}>Show dialog</Button>*/}
       <MultistepDialog
         icon="info-sign"
         title="Autenticação da sua conta Telegram"

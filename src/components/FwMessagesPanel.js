@@ -42,6 +42,7 @@ const FwMessagesPanel = () => {
   function handleClickParar() {
     ipcRenderer.send('stop:monitor');
   }
+  console.log(chatToForwardTo.length > 0);
   return (
     <>
       {allChats.length > 0 && isPending ? (
@@ -49,12 +50,23 @@ const FwMessagesPanel = () => {
       ) : (
         <>
           <h2>Encaminhar Mensagens</h2>
-          <Callout
-            title={`Você tem ${allChats.length} chats iniciados`}
-            intent="warning"
-          >
-            Só é possível monitorar chats que já tenham sido iniciados.
-          </Callout>
+          {!isMonitoring ? (
+            <Callout title={'Monitoramento Parado'} intent="warning">
+              Você tem {allChats.length} chats iniciados.
+              <br />
+              Só é possível monitorar chats que já tenham sido iniciados.
+            </Callout>
+          ) : (
+            <Callout
+              title={`Monitorando ${chatsToMonitor.length} ${
+                chatsToMonitor.length === 1 ? 'chat' : 'chats'
+              }`}
+              intent="primary"
+            >
+              Todas mensagens estão sendo enviadas para o chat:&nbsp;
+              <span className="bp3-tag">{chatToForwardTo.label}</span>
+            </Callout>
+          )}
           <h3>Selecione quais chats deseja monitorar:</h3>
           <ChatSelect options={allChats} isMulti onChange={setChatsToMonitor} />
           <br />
@@ -72,7 +84,11 @@ const FwMessagesPanel = () => {
             fill
             intent="primary"
             onClick={handleClickIniciar}
-            disabled={isMonitoring}
+            disabled={
+              chatToForwardTo.length === 0 ||
+              chatsToMonitor.length === 0 ||
+              isMonitoring
+            }
           />
           <br />
           <Button

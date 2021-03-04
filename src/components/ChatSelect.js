@@ -1,11 +1,14 @@
-import React, { useState, useContext } from 'react';
+import React, { useContext } from 'react';
 import Select from 'react-select';
+import { GlobalContext } from '../GlobalContext';
 
 const ChatSelect = (props) => {
+  const { isMonitoring } = useContext(GlobalContext);
   return (
     <Select
+      isDisabled={isMonitoring}
       {...props}
-      maxMenuHeight="200px"
+      maxMenuHeight="150px"
       options={props.options}
       noOptionsMessage={() => 'Não foi encontrado nenhum chat :('}
       className="react-select-container"

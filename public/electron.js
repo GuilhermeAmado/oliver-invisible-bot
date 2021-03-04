@@ -5,10 +5,10 @@ const path = require('path');
 const util = require('util');
 const isDev = require('electron-is-dev');
 const { client, forwardMessage } = require('./tdl/client');
-// const {
-//   default: installExtension,
-//   REACT_DEVELOPER_TOOLS,
-// } = require('electron-devtools-installer');
+const {
+  default: installExtension,
+  REACT_DEVELOPER_TOOLS,
+} = require('electron-devtools-installer');
 
 let chatIdArray = [];
 let chatIdToForwardTo = null;
@@ -16,7 +16,7 @@ let chatIdToForwardTo = null;
 // CREATE MAIN WINDOW AND CONNECT TO TELEGRAM
 function createWindow() {
   const win = new BrowserWindow({
-    width: 960,
+    width: 720,
     height: 720,
     webPreferences: {
       nodeIntegration: true,
@@ -36,6 +36,7 @@ function createWindow() {
       win.webContents.send('open:toast', {
         intent: 'success',
         message: 'Conectado ao Telegram!',
+        icon: 'tick-circle',
       });
     }
   });
@@ -105,13 +106,15 @@ function createWindow() {
       console.log('tem id e array é maior que zero');
       event.reply('started:monitoring', {
         intent: 'primary',
-        message: 'Monitoramento iniciado ✔',
+        message: 'Monitoramento iniciado',
+        icon: 'tick-circle',
       });
     }
     if (chatIdArray.includes(chatIdToForwardTo)) {
       event.reply('stopped:monitoring', {
         intent: 'danger',
         message: 'O grupo que recebe as mensagens não pode ser monitorado',
+        icon: 'error',
       });
     }
   });
@@ -123,6 +126,7 @@ function createWindow() {
     event.reply('stopped:monitoring', {
       intent: 'warning',
       message: 'Monitoramento parado!',
+      icon: 'warning-sign',
     });
   });
 
@@ -139,7 +143,8 @@ function createWindow() {
       forwardMessage(chatIdToForwardTo, id, update.message.id);
       win.webContents.send('update', {
         intent: 'success',
-        message: '✅ MENSAGEM ENCAMINHADA! ',
+        message: 'Mensagem encaminhada com sucesso',
+        icon: 'redo',
       });
     }
   });

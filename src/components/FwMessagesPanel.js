@@ -14,10 +14,19 @@ const FwMessagesPanel = () => {
     chatToForwardTo,
     setChatToForwardTo,
     isMonitoring,
-    setIsMonitoring,
+    connected,
+    setIsConnected,
   } = useContext(GlobalContext);
 
   useEffect(() => {
+    ipcRenderer.send('get:auth-state');
+    ipcRenderer.on('got:auth-state', (event, props) => {
+      if (props._ === 'authorizationStateReady') {
+        setIsConnected(true);
+      } else {
+        setIsConnected(false);
+      }
+    });
     ipcRenderer.on('got:chats', (event, props) => {
       console.log('HEEEYY I got the chats');
       console.log(props.contents);
@@ -43,7 +52,6 @@ const FwMessagesPanel = () => {
   function handleClickParar() {
     ipcRenderer.send('stop:monitor');
   }
-  console.log(chatToForwardTo.length > 0);
   return (
     <>
       {allChats.length > 0 && isPending ? (
@@ -51,7 +59,14 @@ const FwMessagesPanel = () => {
       ) : (
         <>
           <h2>Encaminhar Mensagens</h2>
-          {!isMonitoring ? (
+          {!connected ? (
+            <Callout title={'Bot desconectado'} intent="danger">
+              Sua conta não está conectada.
+              <br />
+              Para se conectar, clique em Configurações &gt; Conectar ao
+              Telegram
+            </Callout>
+          ) : !isMonitoring ? (
             <Callout title={'Monitoramento Parado'} intent="warning">
               Você tem {allChats.length} chats iniciados.
               <br />

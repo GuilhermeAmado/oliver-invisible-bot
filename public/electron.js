@@ -48,8 +48,11 @@ function createWindow() {
   const win = new BrowserWindow({
     width: 720,
     height: 720,
+    frame: false,
+    transparent: true,
     webPreferences: {
       nodeIntegration: true,
+      enableRemoteModule: true,
     },
   });
 
@@ -68,6 +71,18 @@ function createWindow() {
     });
     loginTelegram()
       .then(async () => {
+        const auth_state = await client.invoke({
+          _: 'getAuthorizationState',
+        });
+        console.log('___________auth_state: ', auth_state);
+        win.webContents.send('got:auth-state', auth_state);
+        if (auth_state._ === 'authorizationStateReady') {
+          win.webContents.send('auth:ok', {
+            intent: 'success',
+            message: 'Conectado ao Telegram',
+            icon: 'tick-circle',
+          });
+        }
         const allChats = await getChatList().then((chats) => chats);
         win.webContents.send('got:chats', { contents: allChats });
       })
@@ -111,6 +126,13 @@ function createWindow() {
     });
   });
 
+  ipcMain.on('get:auth-state', async (event, args) => {
+    const auth_state = await client.invoke({
+      _: 'getAuthorizationState',
+    });
+    event.reply('got:auth-state', auth_state);
+  });
+
   client.on('error', console.error);
 
   client.on('update', (update) => {
@@ -130,6 +152,10 @@ function createWindow() {
     }
   });
 }
+
+ipcMain.on('quit:app', (event, args) => {
+  app.quit();
+});
 
 app.whenReady().then(() => {
   createWindow();

@@ -38,6 +38,7 @@ body {
 
 h1 {
   text-align: center;
+  font-size: 18px;
 }
 
 h2 {
@@ -48,10 +49,89 @@ button {
   outline: none !important;
 }
 
+body {
+  top: 0;
+  left: 0;
+  height: 720px;
+  background-color: transparent;
+}
+
+#root {
+  height: 720px;
+  background-color: #293742;
+  border-radius: 5px;
+}
+
 .container,
+.header-container,
 .bp3-dialog {
   max-width: 80vw;
   margin: 0 auto;
+}
+
+.bp3-overlay-backdrop {
+  border-radius: 5px;
+}
+
+.bp3-drawer,
+.bp3-menu,
+.bp3-menu-item {
+  -webkit-app-region: no-drag !important;
+}
+
+.bp3-drawer {
+  -webkit-app-region: no-drag !important;
+  margin-top: 70px;
+  width: 300px !important;
+  background: none !important;
+  box-shadow: none !important;
+  height: 100px !important;
+}
+
+.bp3-menu.drawer-menu {
+  width: 100%;
+}
+
+.status-tag {
+  margin: 10px 0px;
+  padding: 5px 0px;
+  text-align: center;
+}
+
+.header {
+  -webkit-app-region: drag;
+  padding: 0;
+  margin-bottom: 50px;
+  background-color: #202b33 !important;
+  border-radius: 5px 5px 50px 50px;
+}
+
+.header-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.main-heading {
+  color: #a7b6c2;
+  display: inline-block;
+  padding: 0;
+  margin: 8px 0 5px 0;
+}
+
+.about-body {
+  color: #a7b6c2 !important;
+  font-weight: 700;
+}
+
+.button-group {
+  -webkit-app-region: no-drag;
+  z-index: 20;
+}
+
+.bp3-popover2-content:focus {
+  outline: none !important;
+  border: 1px solid rgba(16, 22, 26, 0.3);
 }
 
 .bp3-dialog {

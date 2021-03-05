@@ -19,7 +19,6 @@
   "homepage": "./",
   "dependencies": {
     "@blueprintjs/core": "^3.39.0",
-    "@blueprintjs/popover2": "^0.3.0",
     "@blueprintjs/select": "^3.15.5",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
@@ -31,6 +30,7 @@
     "react-phone-input-2": "^2.13.9",
     "react-scripts": "4.0.3",
     "react-select": "^4.1.0",
+    "react-spring": "^8.0.27",
     "tdl": "^7.0.0",
     "tdl-tdlib-addon": "^1.0.1",
     "web-vitals": "^1.0.1"

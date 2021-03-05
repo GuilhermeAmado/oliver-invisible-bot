@@ -17,8 +17,10 @@ const CodePanel = (props) => {
   }, []); //eslint-disable-line
   return (
     <div className={Classes.DIALOG_BODY}>
-      <p>Em instantes você receberá um código de autenticação</p>
-      {isPending && <Spinner />}
+      <p>
+        Em instantes você receberá um código de autenticação no telefone:{' '}
+        {props.phone}
+      </p>
       <InputGroup
         large="true"
         leftIcon="lock"

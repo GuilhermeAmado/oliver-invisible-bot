@@ -1,21 +1,28 @@
 import { ipcRenderer } from 'electron';
 import React, { useEffect, useContext } from 'react';
+import About from './components/About';
 import Auth from './components/Auth';
+import Header from './components/Header';
 import TabMenu from './components/TabMenu';
 import { AppToaster } from './components/Toaster';
 import { GlobalContext } from './GlobalContext';
 
 const App = () => {
-  const { isMonitoring, setIsMonitoring } = useContext(GlobalContext);
+  const { setIsConnected, setIsMonitoring } = useContext(GlobalContext);
+  const { isAboutOpen, setIsAboutOpen } = useContext(GlobalContext);
   useEffect(() => {
-    // ipcRenderer.send('get:chats');
+    ipcRenderer.send('get:auth-state');
+    ipcRenderer.once('got:auth-state', (event, props) => {
+      if (props._ === 'authorizationStateReady') {
+        setIsConnected(true);
+      } else {
+        setIsConnected(false);
+      }
+    });
     ipcRenderer.on('auth:needed', (event, props) => {
       console.log('OPA! O usuário precisa fazer login!!! ⚡');
     });
     ipcRenderer.on('auth:ok', (event, props) => {
-      console.log('OPA! O usuário está conectado! 🆗👌');
-    });
-    ipcRenderer.once('open:toast', (event, props) => {
       AppToaster.show({ ...props });
     });
     ipcRenderer.on('update', (event, props) => {
@@ -33,10 +40,13 @@ const App = () => {
   }, []); // eslint-disable-line
   return (
     <>
-      <div className="container bp3-dark">
-        <h1>Oliver Telegram Bot</h1>
-        <TabMenu />
-        <Auth />
+      <div className="bp3-dark">
+        <Header />
+        <div className="container">
+          <TabMenu />
+          <Auth />
+        </div>
+        <About />
       </div>
     </>
   );

@@ -5,6 +5,7 @@
 /.pnp
 /_td_database
 /_td_files
+/dist
 .pnp.js
 
 # testing

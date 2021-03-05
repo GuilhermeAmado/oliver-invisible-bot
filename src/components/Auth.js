@@ -1,5 +1,5 @@
 import { ipcRenderer } from 'electron';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
   Dialog,
   MultistepDialog,
@@ -11,25 +11,28 @@ import {
 } from '@blueprintjs/core';
 import PhonePanel from './PhonePanel';
 import CodePanel from './CodePanel';
+import { GlobalContext } from '../GlobalContext';
 
 const Auth = () => {
+  const { showAuthDialog, setShowAuthDialog } = useContext(GlobalContext);
   const [isOpen, setIsOpen] = useState(false);
   const [phone, setPhone] = useState('');
   const [code, setCode] = useState('');
   const handleOpen = () => setIsOpen(true);
-  const handleClose = () => setIsOpen(false);
+  const handleClose = () => setShowAuthDialog(false);
   const handleClick = () => {
     handleClose();
     ipcRenderer.send('code:submitted', {
       contents: code,
     });
+    ipcRenderer.send('get:auth-state');
   };
 
   useEffect(() => {
-    ipcRenderer.on('auth:needed', () => {
-      setIsOpen(true);
+    ipcRenderer.once('auth:needed', () => {
+      setShowAuthDialog(true);
     });
-  }, []);
+  }, []); //eslint-disable-line
 
   return (
     <>
@@ -38,7 +41,7 @@ const Auth = () => {
         icon="info-sign"
         title="Autenticação da sua conta Telegram"
         onClose={handleClose}
-        isOpen={isOpen}
+        isOpen={showAuthDialog}
         className="container bp3-dark"
         nextButtonProps={{
           text: 'Próximo',

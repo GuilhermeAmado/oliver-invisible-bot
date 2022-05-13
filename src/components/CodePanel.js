@@ -1,19 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { Classes, Spinner, InputGroup } from '@blueprintjs/core';
+import React, { useEffect } from 'react';
+import { Classes, InputGroup } from '@blueprintjs/core';
 import 'fs';
 import { ipcRenderer } from 'electron';
 
 const CodePanel = (props) => {
-  const [isPending, setIsPending] = useState(true);
   const [code, setCode] = props.setCode;
   useEffect(() => {
-    console.log('enviando para o back-end isso: ', props.phone);
     ipcRenderer.send('phone:submitted', {
       contents: props.phone,
     });
-    return () => {
-      console.log('cleanup function here');
-    };
   }, []); //eslint-disable-line
   return (
     <div className={Classes.DIALOG_BODY}>

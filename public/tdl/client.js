@@ -40,7 +40,6 @@ async function getChatInfo(id) {
 }
 
 async function forwardMessage(chatTo, chatFrom, messageId) {
-  console.log('Mensagem encaminhada');
   return await client.invoke({
     _: 'forwardMessages',
     chat_id: chatTo,

@@ -28,8 +28,6 @@ const FwMessagesPanel = () => {
       }
     });
     ipcRenderer.on('got:chats', (event, props) => {
-      console.log('HEEEYY I got the chats');
-      console.log(props.contents);
       setAllChats(
         props.contents.map((chat) => {
           return {

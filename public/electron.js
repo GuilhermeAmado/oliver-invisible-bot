@@ -64,8 +64,8 @@ function createWindow() {
 
   win.webContents.on('did-finish-load', async () => {
     connectTelegram()
-      .then(() => console.log('CONECTADO!'))
-      .catch((err) => console.log(err));
+      .then(() => console.info('CONNECTED!'))
+      .catch((err) => console.error(err));
     client.on('auth-needed', () => {
       win.webContents.send('auth:needed');
     });
@@ -74,7 +74,6 @@ function createWindow() {
         const auth_state = await client.invoke({
           _: 'getAuthorizationState',
         });
-        console.log('___________auth_state: ', auth_state);
         win.webContents.send('got:auth-state', auth_state);
         if (auth_state._ === 'authorizationStateReady') {
           win.webContents.send('auth:ok', {
@@ -86,20 +85,15 @@ function createWindow() {
         const allChats = await getChatList().then((chats) => chats);
         win.webContents.send('got:chats', { contents: allChats });
       })
-      .catch((err) => console.log(err));
+      .catch((err) => console.error(err));
   });
 
   ipcMain.on('start:monitor', (event, args) => {
-    console.log('RECEBI COMANDO PARA MONITORAR!');
     chatIdArray = [];
     chatIdToForwardTo = null;
     args.chatsToMonitor.forEach((chat) => chatIdArray.push(chat.value));
     chatIdToForwardTo = args.chatToForwardTo.value;
-    console.log(args);
-    console.log(chatIdArray);
-    console.log(chatIdToForwardTo);
     if (chatIdToForwardTo && chatIdArray.length > 0) {
-      console.log('tem id e array é maior que zero');
       event.reply('started:monitoring', {
         intent: 'primary',
         message: 'Monitoramento iniciado',
@@ -116,7 +110,6 @@ function createWindow() {
   });
 
   ipcMain.on('stop:monitor', (event, args) => {
-    console.log('Recebi o comando para PARAR de monitorar! 🤚🛑');
     chatIdArray = [];
     chatIdToForwardTo = null;
     event.reply('stopped:monitoring', {
@@ -142,7 +135,6 @@ function createWindow() {
       chatIdArray.includes(id) &&
       update._ === 'updateNewMessage'
     ) {
-      // console.log('______UPDATE', util.inspect(update, false, null, true));
       forwardMessage(chatIdToForwardTo, id, update.message.id);
       win.webContents.send('update', {
         intent: 'success',

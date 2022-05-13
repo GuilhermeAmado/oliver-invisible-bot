@@ -9,7 +9,6 @@ import { GlobalContext } from './GlobalContext';
 
 const App = () => {
   const { setIsConnected, setIsMonitoring } = useContext(GlobalContext);
-  const { isAboutOpen, setIsAboutOpen } = useContext(GlobalContext);
   useEffect(() => {
     ipcRenderer.send('get:auth-state');
     ipcRenderer.once('got:auth-state', (event, props) => {
@@ -19,20 +18,20 @@ const App = () => {
         setIsConnected(false);
       }
     });
-    ipcRenderer.on('auth:needed', (event, props) => {
-      console.log('OPA! O usuário precisa fazer login!!! ⚡');
-    });
+
     ipcRenderer.on('auth:ok', (event, props) => {
       AppToaster.show({ ...props });
     });
+
     ipcRenderer.on('update', (event, props) => {
-      console.log('⚡ BACK END RECEBEU UPDATE');
       AppToaster.show({ ...props });
     });
+
     ipcRenderer.on('started:monitoring', (event, props) => {
       setIsMonitoring(true);
       AppToaster.show({ ...props });
     });
+
     ipcRenderer.on('stopped:monitoring', (event, props) => {
       setIsMonitoring(false);
       AppToaster.show({ ...props });

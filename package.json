@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "A smart Telegram bot that forwards messages",
   "author": "Guilherme Amado",
+  "license": "MIT",
   "main": "public/electron.js",
   "build": {
     "appId": "ollie.oliver",

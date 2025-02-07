@@ -3,8 +3,8 @@ const { TDLib } = require('tdl-tdlib-addon');
 const { ipcMain } = require('electron');
 
 const client = new Client(new TDLib(), {
-  apiId: 3166337, // Your api_id
-  apiHash: '28b23f0714e5d6a6df43df3690927515', // Your api_hash
+  apiId: 0, // Your api_id
+  apiHash: '', // Your api_hash
 });
 
 async function connectTelegram() {
